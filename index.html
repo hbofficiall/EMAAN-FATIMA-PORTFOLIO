@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Emaan Fatima | Professional Video Editor</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;800&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #0a0a0a;
+            color: #ffffff;
+            overflow-x: hidden;
+        }
+        
+        .font-cinzel {
+            font-family: 'Cinzel', serif;
+        }
+        
+        #canvas-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            pointer-events: none;
+        }
+        
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+        
+        .text-gradient {
+            background: linear-gradient(135deg, #f5f5f5 0%, #c0c0c0 50%, #f5f5f5 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .gold-gradient {
+            background: linear-gradient(135deg, #ffd700 0%, #ffed4e 50%, #ffd700 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .btn-3d {
+            transform-style: preserve-3d;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-3d:hover {
+            transform: translateY(-5px) rotateX(10deg);
+            box-shadow: 0 20px 40px rgba(255, 215, 0, 0.3);
+        }
+        
+        .portfolio-card {
+            transform-style: preserve-3d;
+            transition: transform 0.5s ease;
+        }
+        
+        .portfolio-card:hover {
+            transform: rotateY(10deg) rotateX(5deg) translateZ(20px);
+        }
+        
+        .review-card {
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotateX(0deg); }
+            50% { transform: translateY(-20px) rotateX(5deg); }
+        }
+        
+        .loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000;
+            z-index: 9999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: opacity 1s ease;
+        }
+        
+        .loader-text {
+            font-size: 3rem;
+            letter-spacing: 0.5em;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 1; }
+        }
+        
+        .hidden-section {
+            opacity: 0;
+            transform: translateY(50px);
+        }
+        
+        .video-type-btn {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .video-type-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,215,0,0.4), transparent);
+            transition: left 0.5s;
+        }
+        
+        .video-type-btn:hover::before {
+            left: 100%;
+        }
+        
+        .marquee {
+            overflow: hidden;
+            white-space: nowrap;
+        }
+        
+        .marquee-content {
+            display: inline-block;
+            animation: marquee 20s linear infinite;
+        }
+        
+        @keyframes marquee {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Loader -->
+    <div class="loader" id="loader">
+        <div class="font-cinzel text-white loader-text">EMAAN FATIMA</div>
+    </div>
+
+    <!-- 3D Background Canvas -->
+    <div id="canvas-container"></div>
+
+    <!-- Navigation -->
+    <nav class="fixed top-0 w-full z-50 px-8 py-6 flex justify-between items-center glass-panel">
+        <div class="font-cinzel text-2xl font-bold tracking-widest text-gradient">EF</div>
+        <div class="hidden md:flex space-x-8">
+            <a href="#home" class="hover:text-yellow-400 transition-colors duration-300">Home</a>
+            <a href="#about" class="hover:text-yellow-400 transition-colors duration-300">About</a>
+            <a href="#portfolio" class="hover:text-yellow-400 transition-colors duration-300">Portfolio</a>
+            <a href="#reviews" class="hover:text-yellow-400 transition-colors duration-300">Reviews</a>
+            <a href="#contact" class="hover:text-yellow-400 transition-colors duration-300">Contact</a>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="home" class="min-h-screen flex items-center justify-center relative px-4">
+        <div class="text-center z-10 max-w-5xl mx-auto">
+            <div class="mb-4 text-yellow-500 tracking-[0.3em] text-sm uppercase opacity-0" id="hero-subtitle">Welcome to My Creative Space</div>
+            <h1 class="font-cinzel text-6xl md:text-8xl lg:text-9xl font-bold mb-6 text-gradient opacity-0" id="hero-title">
+                EMAAN<br>FATIMA
+            </h1>
+            <div class="w-32 h-1 bg-gradient-to-r from-transparent via-yellow-500 to-transparent mx-auto mb-8 opacity-0" id="hero-line"></div>
+            <p class="text-xl md:text-2xl text-gray-300 mb-12 max-w-2xl mx-auto opacity-0" id="hero-desc">
+                Professional Video Editor & Visual Storyteller<br>
+                <span class="text-yellow-400">3+ Years of Excellence</span>
+            </p>
+            <div class="flex flex-col md:flex-row gap-6 justify-center opacity-0" id="hero-buttons">
+                <a href="#portfolio" class="btn-3d px-8 py-4 bg-gradient-to-r from-yellow-600 to-yellow-400 text-black font-bold rounded-lg hover:shadow-2xl transition-all">
+                    View My Work
+                </a>
+                <a href="#contact" class="btn-3d px-8 py-4 border-2 border-yellow-400 text-yellow-400 font-bold rounded-lg hover:bg-yellow-400 hover:text-black transition-all">
+                    Get In Touch
+                </a>
+            </div>
+        </div>
+        
+        <!-- Scroll Indicator -->
+        <div class="absolute bottom-10 left-1/2 transform -translate-x-1/2 animate-bounce">
+            <svg class="w-6 h-6 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
+            </svg>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="py-32 px-4 relative">
+        <div class="max-w-7xl mx-auto">
+            <div class="grid md:grid-cols-2 gap-16 items-center">
+                <div class="hidden-section">
+                    <div class="font-cinzel text-yellow-500 text-sm tracking-[0.3em] mb-4">ABOUT ME</div>
+                    <h2 class="text-5xl md:text-6xl font-bold mb-8 text-gradient">Crafting Visual<br>Masterpieces</h2>
+                    <p class="text-gray-300 text-lg leading-relaxed mb-6">
+                        With over <span class="text-yellow-400 font-bold">3+ years of experience</span> in video editing, I transform raw footage into compelling visual stories that captivate audiences and drive engagement.
+                    </p>
+                    <p class="text-gray-400 leading-relaxed mb-8">
+                        From cinematic long-form content to viral short-form videos, I specialize in creating high-quality edits for YouTube, Instagram Reels, TikTok, and professional advertisements. My expertise spans color grading, motion graphics, sound design, and visual effects.
+                    </p>
+                    
+                    <div class="grid grid-cols-3 gap-6 mt-8">
+                        <div class="text-center p-4 glass-panel rounded-lg">
+                            <div class="text-3xl font-bold text-yellow-400 mb-2">3+</div>
+                            <div class="text-sm text-gray-400">Years Exp.</div>
+                        </div>
+                        <div class="text-center p-4 glass-panel rounded-lg">
+                            <div class="text-3xl font-bold text-yellow-400 mb-2">500+</div>
+                            <div class="text-sm text-gray-400">Projects</div>
+                        </div>
+                        <div class="text-center p-4 glass-panel rounded-lg">
+                            <div class="text-3xl font-bold text-yellow-400 mb-2">50+</div>
+                            <div class="text-sm text-gray-400">Clients</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="hidden-section relative">
+                    <div class="absolute inset-0 bg-gradient-to-r from-yellow-500 to-purple-600 rounded-2xl blur-3xl opacity-20"></div>
+                    <div class="glass-panel p-8 rounded-2xl relative transform hover:scale-105 transition-transform duration-500">
+                        <div class="space-y-6">
+                            <div class="flex items-center space-x-4">
+                                <div class="w-12 h-12 rounded-full bg-yellow-500/20 flex items-center justify-center">
+                                    <svg class="w-6 h-6 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                                    </svg>
+                                </div>
+                                <div>
+                                    <h3 class="font-bold text-lg">Long Form Content</h3>
+                                    <p class="text-gray-400 text-sm">YouTube Videos, Documentaries, Vlogs</p>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-center space-x-4">
+                                <div class="w-12 h-12 rounded-full bg-yellow-500/20 flex items-center justify-center">
+                                    <svg class="w-6 h-6 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                                    </svg>
+                                </div>
+                                <div>
+                                    <h3 class="font-bold text-lg">Short Form Content</h3>
+                                    <p class="text-gray-400 text-sm">Reels, Shorts, TikToks, Ads</p>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-center space-x-4">
+                                <div class="w-12 h-12 rounded-full bg-yellow-500/20 flex items-center justify-center">
+                                    <svg class="w-6 h-6 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 4v16M17 4v16M3 8h4m10 0h4M3 12h18M3 16h4m10 0h4M4 20h16a1 1 0 001-1V5a1 1 0 00-1-1H4a1 1 0 00-1 1v14a1 1 0 001 1z"></path>
+                                    </svg>
+                                </div>
+                                <div>
+                                    <h3 class="font-bold text-lg">Commercial & Promo</h3>
+                                    <p class="text-gray-400 text-sm">Trailers, Ads, Product Videos</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Portfolio Section -->
+    <section id="portfolio" class="py-32 px-4 relative">
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center mb-20 hidden-section">
+                <div class="font-cinzel text-yellow-500 text-sm tracking-[0.3em] mb-4">PORTFOLIO</div>
+                <h2 class="text-5xl md:text-6xl font-bold mb-6 text-gradient">My Creative Work</h2>
+                <p class="text-gray-400 max-w-2xl mx-auto">Explore my diverse collection of video editing projects. Click on any category to view the full portfolio.</p>
+            </div>
+
+            <!-- Video Type Selection -->
+            <div class="grid md:grid-cols-2 gap-8 mb-16">
+                <!-- Long Form Videos -->
+                <div class="hidden-section portfolio-card glass-panel rounded-2xl p-8 cursor-pointer group" onclick="openDrive('long')">
+                    <div class="h-64 mb-6 rounded-xl bg-gradient-to-br from-purple-900 to-blue-900 flex items-center justify-center relative overflow-hidden">
+                        <div class="absolute inset-0 bg-black/40 group-hover:bg-black/20 transition-all duration-500"></div>
+                        <svg class="w-24 h-24 text-white/80 relative z-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        <div class="absolute bottom-4 left-4 right-4">
+                            <div class="text-white font-bold text-xl">Long Form Content</div>
+                            <div class="text-white/70 text-sm">Click to View Portfolio</div>
+                        </div>
+                    </div>
+                    <h3 class="text-2xl font-bold mb-3 group-hover:text-yellow-400 transition-colors">Long Form Videos</h3>
+                    <p class="text-gray-400 mb-4">Professional YouTube content, documentaries, vlogs, podcasts, and cinematic storytelling.</p>
+                    <div class="flex flex-wrap gap-2">
+                        <span class="px-3 py-1 bg-purple-500/20 text-purple-300 rounded-full text-xs">YouTube</span>
+                        <span class="px-3 py-1 bg-purple-500/20 text-purple-300 rounded-full text-xs">Documentaries</span>
+                        <span class="px-3 py-1 bg-purple-500/20 text-purple-300 rounded-full text-xs">Vlogs</span>
+                        <span class="px-3 py-1 bg-purple-500/20 text-purple-300 rounded-full text-xs">Podcasts</span>
+                    </div>
+                    <button class="video-type-btn mt-6 w-full py-3 bg-gradient-to-r from-purple-600 to-blue-600 rounded-lg font-bold text-white hover:shadow-lg transition-all">
+                        View Long Form Portfolio
+                    </button>
+                </div>
+
+                <!-- Short Form Videos -->
+                <div class="hidden-section portfolio-card glass-panel rounded-2xl p-8 cursor-pointer group" onclick="openDrive('short')">
+                    <div class="h-64 mb-6 rounded-xl bg-gradient-to-br from-pink-900 to-orange-900 flex items-center justify-center relative overflow-hidden">
+                        <div class="absolute inset-0 bg-black/40 group-hover:bg-black/20 transition-all duration-500"></div>
+                        <svg class="w-24 h-24 text-white/80 relative z-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                        </svg>
+                        <div class="absolute bottom-4 left-4 right-4">
+                            <div class="text-white font-bold text-xl">Short Form Content</div>
+                            <div class="text-white/70 text-sm">Click to View Portfolio</div>
+                        </div>
+                    </div>
+                    <h3 class="text-2xl font-bold mb-3 group-hover:text-yellow-400 transition-colors">Short Form Videos</h3>
+                    <p class="text-gray-400 mb-4">Viral Instagram Reels, TikToks, YouTube Shorts, and high-converting advertisements.</p>
+                    <div class="flex flex-wrap gap-2">
+                        <span class="px-3 py-1 bg-pink-500/20 text-pink-300 rounded-full text-xs">Reels</span>
+                        <span class="px-3 py-1 bg-pink-500/20 text-pink-300 rounded-full text-xs">TikTok</span>
+                        <span class="px-3 py-1 bg-pink-500/20 text-pink-300 rounded-full text-xs">Shorts</span>
+                        <span class="px-3 py-1 bg-pink-500/20 text-pink-300 rounded-full text-xs">Ads</span>
+                    </div>
+                    <button class="video-type-btn mt-6 w-full py-3 bg-gradient-to-r from-pink-600 to-orange-600 rounded-lg font-bold text-white hover:shadow-lg transition-all">
+                        View Short Form Portfolio
+                    </button>
+                </div>
+            </div>
+
+            <!-- Skills Marquee -->
+            <div class="marquee py-8 border-y border-white/10 hidden-section">
+                <div class="marquee-content text-2xl font-cinzel text-gray-500">
+                    <span class="mx-8">PREMIERE PRO</span>
+                    <span class="mx-8 text-yellow-500">•</span>
+                    <span class="mx-8">AFTER EFFECTS</span>
+                    <span class="mx-8 text-yellow-500">•</span>
+                    <span class="mx-8">DAVINCI RESOLVE</span>
+                    <span class="mx-8 text-yellow-500">•</span>
+                    <span class="mx-8">PHOTOSHOP</span>
+                    <span class="mx-8 text-yellow-500">•</span>
+                    <span class="mx-8">COLOR GRADING</span>
+                    <span class="mx-8 text-yellow-500">•</span>
+                    <span class="mx-8">MOTION GRAPHICS</span>
+                    <span class="mx-8 text-yellow-500">•</span>
+                    <span class="mx-8">PREMIERE PRO</span>
+                    <span class="mx-8 text-yellow-500">•</span>
+                    <span class="mx-8">AFTER EFFECTS</span>
+                    <span class="mx-8 text-yellow-500">•</span>
+                    <span class="mx-8">DAVINCI RESOLVE</span>
+                    <span class="mx-8 text-yellow-500">•</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Reviews Section -->
+    <section id="reviews" class="py-32 px-4 relative overflow-hidden">
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center mb-20 hidden-section">
+                <div class="font-cinzel text-yellow-500 text-sm tracking-[0.3em] mb-4">TESTIMONIALS</div>
+                <h2 class="text-5xl md:text-6xl font-bold mb-6 text-gradient">Client Reviews</h2>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-8">
+                <!-- Review 1 -->
+                <div class="hidden-section review-card glass-panel p-8 rounded-2xl" style="animation-delay: 0s;">
+                    <div class="flex items-center mb-4">
+                        <div class="w-12 h-12 rounded-full bg-gradient-to-r from-yellow-400 to-orange-500 flex items-center justify-center text-black font-bold text-xl">A</div>
+                        <div class="ml-4">
+                            <div class="font-bold">Ahmed Khan</div>
+                            <div class="text-yellow-500 text-sm">YouTuber</div>
+                        </div>
+                    </div>
+                    <div class="flex mb-4 text-yellow-400">
+                        ★★★★★
+                    </div>
+                    <p class="text-gray-300">"Emaan transformed my raw footage into cinematic gold. The attention to detail and color grading is absolutely phenomenal. My channel growth increased by 200%!"</p>
+                </div>
+
+                <!-- Review 2 -->
+                <div class="hidden-section review-card glass-panel p-8 rounded-2xl" style="animation-delay: 0.5s;">
+                    <div class="flex items-center mb-4">
+                        <div class="w-12 h-12 rounded-full bg-gradient-to-r from-purple-400 to-pink-500 flex items-center justify-center text-black font-bold text-xl">S</div>
+                        <div class="ml-4">
+                            <div class="font-bold">Sarah Johnson</div>
+                            <div class="text-yellow-500 text-sm">Business Owner</div>
+                        </div>
+                    </div>
+                    <div class="flex mb-4 text-yellow-400">
+                        ★★★★★
+                    </div>
+                    <p class="text-gray-300">"The short-form content Emaan created for my brand went viral instantly. Professional, creative, and always delivers on time. Highly recommended!"</p>
+                </div>
+
+                <!-- Review 3 -->
+                <div class="hidden-section review-card glass-panel p-8 rounded-2xl" style="animation-delay: 1s;">
+                    <div class="flex items-center mb-4">
+                        <div class="w-12 h-12 rounded-full bg-gradient-to-r from-blue-400 to-cyan-500 flex items-center justify-center text-black font-bold text-xl">M</div>
+                        <div class="ml-4">
+                            <div class="font-bold">Mohammad Ali</div>
+                            <div class="text-yellow-500 text-sm">Content Creator</div>
+                        </div>
+                    </div>
+                    <div class="flex mb-4 text-yellow-400">
+                        ★★★★★
+                    </div>
+                    <p class="text-gray-300">"Working with Emaan has been a game-changer. The editing style is modern, engaging, and perfectly captures the essence of my content. Truly talented!"</p>
+                </div>
+
+                <!-- Review 4 -->
+                <div class="hidden-section review-card glass-panel p-8 rounded-2xl" style="animation-delay: 1.5s;">
+                    <div class="flex items-center mb-4">
+                        <div class="w-12 h-12 rounded-full bg-gradient-to-r from-green-400 to-teal-500 flex items-center justify-center text-black font-bold text-xl">Z</div>
+                        <div class="ml-4">
+                            <div class="font-bold">Zara Malik</div>
+                            <div class="text-yellow-500 text-sm">Influencer</div>
+                        </div>
+                    </div>
+                    <div class="flex mb-4 text-yellow-400">
+                        ★★★★★
+                    </div>
+                    <p class="text-gray-300">"Best video editor I've worked with! The transitions, effects, and overall flow of the videos are seamless. My engagement rates have never been higher."</p>
+                </div>
+
+                <!-- Review 5 -->
+                <div class="hidden-section review-card glass-panel p-8 rounded-2xl" style="animation-delay: 2s;">
+                    <div class="flex items-center mb-4">
+                        <div class="w-12 h-12 rounded-full bg-gradient-to-r from-red-400 to-pink-500 flex items-center justify-center text-black font-bold text-xl">H</div>
+                        <div class="ml-4">
+                            <div class="font-bold">Hassan Raza</div>
+                            <div class="text-yellow-500 text-sm">Podcast Host</div>
+                        </div>
+                    </div>
+                    <div class="flex mb-4 text-yellow-400">
+                        ★★★★★
+                    </div>
+                    <p class="text-gray-300">"Emaan edited my podcast episodes with such precision. The audio-visual sync is perfect, and the graphics added that professional touch I was looking for."</p>
+                </div>
+
+                <!-- Review 6 -->
+                <div class="hidden-section review-card glass-panel p-8 rounded-2xl" style="animation-delay: 2.5s;">
+                    <div class="flex items-center mb-4">
+                        <div class="w-12 h-12 rounded-full bg-gradient-to-r from-indigo-400 to-purple-500 flex items-center justify-center text-black font-bold text-xl">F</div>
+                        <div class="ml-4">
+                            <div class="font-bold">Fatima Zahra</div>
+                            <div class="text-yellow-500 text-sm">Marketing Director</div>
+                        </div>
+                    </div>
+                    <div class="flex mb-4 text-yellow-400">
+                        ★★★★★
+                    </div>
+                    <p class="text-gray-300">"Outstanding work on our promotional videos! Emaan understood our brand vision perfectly and delivered content that exceeded all expectations."</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="py-32 px-4 relative">
+        <div class="max-w-4xl mx-auto text-center hidden-section">
+            <div class="font-cinzel text-yellow-500 text-sm tracking-[0.3em] mb-4">GET IN TOUCH</div>
+            <h2 class="text-5xl md:text-6xl font-bold mb-8 text-gradient">Let's Create Together</h2>
+            <p class="text-gray-400 text-xl mb-12">Ready to elevate your content? Let's discuss your next project.</p>
+            
+            <div class="glass-panel p-12 rounded-2xl">
+                <div class="grid md:grid-cols-2 gap-8 text-left">
+                    <div>
+                        <h3 class="text-2xl font-bold mb-4 text-yellow-400">Email</h3>
+                        <p class="text-gray-300 mb-2">emaan57865@gmail.com</p>
+                    </div>
+                    <div>
+                        <h3 class="text-2xl font-bold mb-4 text-yellow-400">Availability</h3>
+                        <p class="text-gray-300 mb-2">Open for new projects</p>
+                    </div>
+                </div>
+                
+                <div class="mt-12">
+                    <a href="mailto:emaan57865@gmail.com" class="inline-block px-12 py-4 bg-gradient-to-r from-yellow-500 to-yellow-600 text-black font-bold text-lg rounded-full hover:shadow-2xl hover:scale-105 transition-all">
+                        Start a Project
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="py-12 px-4 border-t border-white/10">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center">
+            <div class="font-cinzel text-2xl font-bold text-gradient mb-4 md:mb-0">EMAAN FATIMA</div>
+            <div class="text-gray-500 text-sm">© 2025 Emaan Fatima. All rights reserved.</div>
+        </div>
+    </footer>
+
+    <script>
+        // Loader
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                document.getElementById('loader').style.opacity = '0';
+                setTimeout(() => {
+                    document.getElementById('loader').style.display = 'none';
+                    initAnimations();
+                }, 1000);
+            }, 2000);
+        });
+
+        // Three.js 3D Background
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.getElementById('canvas-container').appendChild(renderer.domElement);
+
+        // Create particles
+        const particlesGeometry = new THREE.BufferGeometry();
+        const particlesCount = 1500;
+        const posArray = new Float32Array(particlesCount * 3);
+
+        for(let i = 0; i < particlesCount * 3; i++) {
+            posArray[i] = (Math.random() - 0.5) * 50;
+        }
+
+        particlesGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+        const particlesMaterial = new THREE.PointsMaterial({
+            size: 0.02,
+            color: 0xffd700,
+            transparent: true,
+            opacity: 0.6
+        });
+
+        const particlesMesh = new THREE.Points(particlesGeometry, particlesMaterial);
+        scene.add(particlesMesh);
+
+        camera.position.z = 5;
+
+        // Mouse movement effect
+        let mouseX = 0;
+        let mouseY = 0;
+
+        document.addEventListener('mousemove', (event) => {
+            mouseX = event.clientX / window.innerWidth - 0.5;
+            mouseY = event.clientY / window.innerHeight - 0.5;
+        });
+
+        // Animation loop
+        function animate() {
+            requestAnimationFrame(animate);
+            
+            particlesMesh.rotation.y += 0.001;
+            particlesMesh.rotation.x += 0.001;
+            
+            particlesMesh.rotation.x += mouseY * 0.05;
+            particlesMesh.rotation.y += mouseX * 0.05;
+            
+            renderer.render(scene, camera);
+        }
+        animate();
+
+        // Resize handler
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        // GSAP Animations
+        gsap.registerPlugin(ScrollTrigger);
+
+        function initAnimations() {
+            // Hero animations
+            gsap.to("#hero-subtitle", { opacity: 1, y: 0, duration: 1, delay: 0.2 });
+            gsap.to("#hero-title", { opacity: 1, y: 0, duration: 1.2, delay: 0.4, ease: "power4.out" });
+            gsap.to("#hero-line", { opacity: 1, scaleX: 1, duration: 1, delay: 0.8 });
+            gsap.to("#hero-desc", { opacity: 1, y: 0, duration: 1, delay: 1 });
+            gsap.to("#hero-buttons", { opacity: 1, y: 0, duration: 1, delay: 1.2 });
+
+            // Scroll animations
+            gsap.utils.toArray('.hidden-section').forEach((section, i) => {
+                gsap.to(section, {
+                    opacity: 1,
+                    y: 0,
+                    duration: 1,
+                    ease: "power3.out",
+                    scrollTrigger: {
+                        trigger: section,
+                        start: "top 85%",
+                        toggleActions: "play none none reverse"
+                    }
+                });
+            });
+        }
+
+        // Portfolio Links
+        function openDrive(type) {
+            if (type === 'long') {
+                window.open('https://drive.google.com/drive/folders/1EIxfySZ2DklDNvYMJHZB7a4uL7En4ct0?usp=drive_link', '_blank');
+            } else if (type === 'short') {
+                window.open('https://drive.google.com/drive/folders/1MowXM7S9JDt5edwNgfno7OEl0dYY81QQ?usp=drive_link', '_blank');
+            }
+        }
+
+        // Smooth scroll
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+        });
+
+        // 3D Tilt effect for cards
+        document.querySelectorAll('.portfolio-card').forEach(card => {
+            card.addEventListener('mousemove', (e) => {
+                const rect = card.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                
+                const centerX = rect.width / 2;
+                const centerY = rect.height / 2;
+                
+                const rotateX = (y - centerY) / 20;
+                const rotateY = (centerX - x) / 20;
+                
+                card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateZ(20px)`;
+            });
+            
+            card.addEventListener('mouseleave', () => {
+                card.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) translateZ(0)';
+            });
+        });
+    </script>
+</body>
+</html>
